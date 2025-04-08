@@ -16,28 +16,14 @@ def compile_rust_project(project_path: str) -> Tuple[bool, str]:
         tuple: (success, error_message)
     """
     try:
-        # Save current directory
-        current_dir = os.getcwd()
-        
-        try:
-            # Change to the project directory
-            os.chdir(project_path)
-
-        
-            build_result = subprocess.run(
-                ["cargo", "build"],
-                capture_output=True,
-                text=True
-            )
-            
-            if build_result.returncode != 0:
-                return False, build_result.stderr
-            
-            return True, ""
-        finally:
-            # Restore original directory
-            os.chdir(current_dir)
-    except FileNotFoundError:
-        return False, "Rust/Cargo not found on the system. Please install Rust."
+        result = subprocess.run(
+            ['cargo', 'build'],
+            cwd=project_path,
+            capture_output=True,
+            text=True
+        )
+        success = result.returncode == 0
+        output = result.stdout if success else result.stderr
+        return success, output
     except Exception as e:
         return False, str(e)

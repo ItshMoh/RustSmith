@@ -12,13 +12,13 @@ from dotenv import load_dotenv
 load_dotenv()
 class SmithAgent:
     def __init__(self):
-        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.base_url = "https://anura-testnet.lilypad.tech/api/v1/chat/completions"
         self.model = "qwen/qwen-2.5-coder-32b-instruct:free"
         self.api_key = os.getenv('ROUTER_API_KEY')
     
     def _prepare_headers(self) -> Dict[str, str]:
         return {
-            
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
     
@@ -47,19 +47,35 @@ class SmithAgent:
         Your task is to assemble a complete Rust project using the outputs from specialized agents.
         
         Follow these guidelines:
-        1. Organize code into appropriate files (lib.rs, main.rs, modules)
-        2. Create a proper Cargo.toml file with necessary dependencies
-        3. Ensure the project follows Rust best practices
+
+        Always generate these files:
+        1. Cargo.toml with proper metadata and dependencies
+        2. src/main.rs or src/lib.rs as appropriate
+        3. Any needed module files under src/
         4. Fix any issues or inconsistencies between the agents' outputs
-        5. Format your response clearly indicating file paths and content
-        6. Don't output any Project description outside of the rust markdown code block. If any required do that in the comments format in the file. It is a very critical step.
-        7. Don't write anything outside the rust markdown code block, no matter what. In the code block there can be some comments
-        For each file, format your response as:
-        
-        ```
-        File: path/to/file
-        file content here...
-        ```
+        Format your response strictly as follows:
+    
+    [FILE: Cargo.toml]
+    ```
+    <content>
+    ```
+    [END FILE]
+    
+    [FILE: src/main.rs]
+    ```
+    <content>
+    ```
+    [END FILE]
+    
+    [FILE: src/<module_name>.rs]
+    ```
+    <content>
+    ```
+    [END FILE]
+    
+    you will always produce the 
+    After every file content block, you must write [END FILE]. you have to strictly follow the above response format for files.
+    
         """
         
         # Check if there are any errors in the context to fix
@@ -84,12 +100,7 @@ class SmithAgent:
         
         {error_context}
         
-        Assemble a complete Rust project that implements the requirements.
-        Organize the code into appropriate files with correct paths.
-        For each file, provide the file path and content.
-        Ensure the project structure follows Rust best practices.
-        Don't output any Project description outside of the rust markdown code block.
-        You have to just output the rust code markdown block. Nothing else
+       
         """
         
         messages = [
@@ -97,7 +108,7 @@ class SmithAgent:
             {"role": "user", "content": user_message}
         ]
         payload = json.dumps({
-    "model": "qwen/qwen-2.5-coder-32b-instruct:free",
+    "model": "llama3.1:8b",
     "messages": messages
     
 })

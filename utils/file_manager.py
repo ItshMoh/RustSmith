@@ -9,43 +9,15 @@ from datetime import datetime
 from typing import Dict, Any
 from config import OUTPUT_DIR
 
-def save_project(smith_response: str, user_id: str, project_idea: str, version: int = 1) -> str:
+def save_project1(smith_response: str, project_dir="output") -> str:
     """
     Save the generated Rust project to disk
     
-    Args:
-        smith_response (str): The Smith agent's response with code
-        user_id (str): User identifier
-        project_idea (str): Original project idea
-        version (int): Version number for the project
-        
+    
     Returns:
         str: Path to the saved project
     """
     # Create a safe project name from the idea
-    project_name = re.sub(r'[^a-zA-Z0-9_]', '_', project_idea.lower())
-    project_name = re.sub(r'_+', '_', project_name)
-    project_name = project_name[:30]  # Limit length
-    
-    # Create timestamp
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    # Create project directory
-    project_dir = os.path.join(
-        OUTPUT_DIR, 
-        f"{user_id}_{project_name}_{timestamp}_v{version}"
-    )
-    
-    # Ensure output directory exists
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
-    # Remove directory if it already exists (unlikely due to timestamp)
-    if os.path.exists(project_dir):
-        shutil.rmtree(project_dir)
-    
-    # Create project directory
-    os.makedirs(project_dir, exist_ok=True)
-    
     # Parse files from smith_response
     files = extract_files_from_response(smith_response)
     
@@ -60,20 +32,10 @@ def save_project(smith_response: str, user_id: str, project_idea: str, version: 
         with open(full_path, 'w') as f:
             f.write(content)
     
-    # Create metadata file
-    metadata = {
-        "user_id": user_id,
-        "project_idea": project_idea,
-        "timestamp": timestamp,
-        "version": version
-    }
-    
-    with open(os.path.join(project_dir, "rustsmith_metadata.json"), 'w') as f:
-        json.dump(metadata, f, indent=2)
     
     return project_dir
 
-def extract_files_from_response(response: str) -> Dict[str, str]:
+def extract_files_from_response1(response: str) -> Dict[str, str]:
     """
     Extract file paths and contents from the Smith agent's response
     
@@ -134,6 +96,53 @@ def extract_files_from_response(response: str) -> Dict[str, str]:
         files["src/main.rs"] = generate_default_main_rs()
     
     return files
+
+def save_project(files: Dict[str, str], project_dir: str):
+        for filepath, content in files.items():
+            full_path = os.path.join(project_dir, filepath)
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+        print(f"Files saved successfully in {project_dir}")
+
+def extract_files_from_response(response: str) -> Dict[str, str]:
+        files = {}
+        current_file = None
+        current_content = []
+        extra_text = []
+        inside_file = False
+        inside_code_block = False
+        
+        lines = response.split('\n')
+        
+        for line in lines:
+            if line.startswith('[FILE:'):
+                if current_file and current_content:
+                    files[current_file] = '\n'.join(current_content).strip()
+                current_file = line[6:].strip().rstrip(']')
+                current_content = []
+                inside_file = True
+                inside_code_block = False  
+            elif line.startswith('[END FILE]'):
+                if current_file and current_content:
+                    files[current_file] = '\n'.join(current_content).strip()
+                current_file = None
+                inside_file = False
+                inside_code_block = False
+            elif inside_file:
+                if line.strip().startswith('```'):
+                    inside_code_block = not inside_code_block 
+                    continue
+                if inside_code_block:
+                    current_content.append(line)
+            else:
+                extra_text.append(line)  
+        
+        if extra_text:
+            files["src/README.md"] = '\n'.join(extra_text).strip()
+        
+        return files
+
 
 def generate_default_cargo_toml() -> str:
     """Generate a default Cargo.toml file"""

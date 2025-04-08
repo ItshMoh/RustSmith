@@ -12,14 +12,14 @@ from dotenv import load_dotenv
 load_dotenv()
 class TypeAgent:
     def __init__(self):
-        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.base_url = "https://anura-testnet.lilypad.tech/api/v1/chat/completions"
         self.model = "qwen/qwen-2.5-coder-32b-instruct:free"
         self.api_key = os.getenv('ROUTER_API_KEY')
     
     
     def _prepare_headers(self) -> Dict[str, str]:
         return {
-            
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
     
@@ -82,7 +82,7 @@ class TypeAgent:
             {"role": "user", "content": user_message}
         ]
         payload = json.dumps({
-    "model": "qwen/qwen-2.5-coder-32b-instruct:free",
+    "model": "llama3.1:8b",
     "messages": messages
     
 })

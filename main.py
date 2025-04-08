@@ -14,6 +14,7 @@ from utils.parser import parse_master_response
 from utils.compiler import compile_rust_project
 from utils.file_manager import save_project
 from config import MONGODB_URI, API_KEYS
+from utils.file_manager import save_project, extract_files_from_response
 
 def main():
     print("Welcome to Rustsmith - Generate Rust projects with AI")
@@ -76,13 +77,14 @@ def main():
         agent_responses,
         context
     )
-    
+    print("Smith response:-----\n ", smith_response)
     # Step 5: Save the project
-    project_path = save_project(smith_response, user_id, project_idea)
-    
+    # project_path = save_project(smith_response, user_id, project_idea)
+    parsed_files = extract_files_from_response(smith_response)
+    project_path = save_project(parsed_files,"output")
     # Step 6: Compile the project
-    success, error = compile_rust_project(project_path)
-
+    success, error = compile_rust_project('output/')
+    print(f"Error ---- \n {error}")
     context.append({
             "question": project_idea,
             "answer": smith_response,
@@ -92,9 +94,7 @@ def main():
         # Save context to MongoDB
     db.update_user_context(user_id, context)
     # Step 7: If there are errors, update context and try again
-    while not success:
-
-        print(f"Compilation failed. Attempting to fix errors...")
+    while (success !=True):
         
         # Try to fix errors
         fixed_response = smith_agent.process(
@@ -103,13 +103,13 @@ def main():
             agent_responses,
             context
         )
-        
-        # Save fixed project
-        fixed_project_path = save_project(fixed_response, user_id, project_idea, version=2)
+        print("Smith response:-----\n ", fixed_response)
+        parsed_files = extract_files_from_response(fixed_response)
+        fixed_project_path = save_project(parsed_files,"output")
         
         # Compile again
-        success, error = compile_rust_project(fixed_project_path)
-        
+        success, error = compile_rust_project('output/')
+        print(f"Error ---- \n {error}")
         context.append({
             "question": project_idea,
             "answer": smith_response,

@@ -12,13 +12,12 @@ from dotenv import load_dotenv
 load_dotenv()
 class MasterAgent:
     def __init__(self):
-        self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+        self.base_url = "https://anura-testnet.lilypad.tech/api/v1/chat/completions"
         self.model = "qwen/qwen-2.5-coder-32b-instruct:free"
         self.api_key = os.getenv('ROUTER_API_KEY')
-    
     def _prepare_headers(self) -> Dict[str, str]:
         return {
-            
+            "Content-Type": "application/json",
             "Authorization": f"Bearer {self.api_key}"
         }
     
@@ -43,8 +42,7 @@ class MasterAgent:
         3. Utility Agent: Create utility functions, implementations, and other general-purpose code
         
         For each agent, provide detailed instructions on what they should implement.
-        If an agent isn't needed for this project, explicitly state that.
-        
+
         Format your response with clear sections for each agent:
         
         [STRUCT_AGENT]
@@ -58,6 +56,11 @@ class MasterAgent:
         [UTILITY_AGENT]
         Instructions for the Utility Agent...
         [/UTILITY_AGENT]
+
+
+        Some Guidlines to follow:
+        1. If an agent isn't needed for this project, Don't write any insturctions for that agent and does not include any file format for that agent. It means you don't write even the given format for that agent as given above. write the above format for agent only which are needed for the project.
+        2. In case the project only requires some easy implementation and work use only Utility Agent.
         """
         
         # Format the context for the prompt
@@ -91,7 +94,7 @@ class MasterAgent:
             {"role": "user", "content": user_message}
         ]
         payload = json.dumps({
-    "model": "qwen/qwen-2.5-coder-32b-instruct:free",
+    "model": "llama3.1:8b",
     "messages": messages
     
 })
