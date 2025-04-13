@@ -87,12 +87,13 @@ def main():
     print(f"Error ---- \n {error}")
     context.append({
             "question": project_idea,
-            "answer": smith_response,
+            "answer": parsed_files,
             "error": error
         })
         
         # Save context to MongoDB
     db.update_user_context(user_id, context)
+    print("the project is compiled --------------------------------------------- \n",success)
     # Step 7: If there are errors, update context and try again
     while (success !=True):
         
@@ -100,7 +101,6 @@ def main():
         fixed_response = smith_agent.process(
             project_idea,
             master_response,
-            agent_responses,
             context
         )
         print("Smith response:-----\n ", fixed_response)
@@ -110,7 +110,7 @@ def main():
         # Compile again
         success, error = compile_rust_project('output/')
         print(f"Error ---- \n {error}")
-        context.append({
+        context.append({  
             "question": project_idea,
             "answer": smith_response,
             "error": error

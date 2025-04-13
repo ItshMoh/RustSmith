@@ -13,7 +13,6 @@ load_dotenv()
 class StructAgent:
     def __init__(self):
         self.base_url = "https://anura-testnet.lilypad.tech/api/v1/chat/completions"
-        self.model = "qwen/qwen-2.5-coder-32b-instruct:free"
         self.api_key = os.getenv('ROUTER_API_KEY')
     
     def _prepare_headers(self) -> Dict[str, str]:
@@ -81,7 +80,7 @@ class StructAgent:
             {"role": "user", "content": user_message}
         ]
         payload = json.dumps({
-    "model": "llama3.1:8b",
+    "model": "phi4:14b",
     "messages": messages
     
 })

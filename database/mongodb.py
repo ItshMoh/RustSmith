@@ -6,7 +6,7 @@ from config import MONGODB_URI, MONGODB_DB, MONGODB_COLLECTION
 
 class MongoDB:
     def __init__(self, uri=MONGODB_URI):
-        self.client = pymongo.MongoClient('mongodb+srv://mohcodes:SitARam%40108@mlproject.yu0js.mongodb.net/?retryWrites=true&w=majority&appName=MlProject')
+        self.client = pymongo.MongoClient(MONGODB_URI)
         self.db = self.client['rustsmith']
         self.collection = self.db['user_contexts']
     
@@ -22,7 +22,9 @@ class MongoDB:
         """
         user_record = self.collection.find_one({"user_id": user_id})
         if user_record:
-            return user_record.get("context", [])
+            context = user_record.get("context", [])
+            if context:
+                return context[-1]
         return []
     
     def update_user_context(self, user_id, context):
@@ -41,4 +43,6 @@ class MongoDB:
             {"$set": {"context": context}},
             upsert=True
         )
+        print("The context has been updated ---------- \n",context)
         return True
+
