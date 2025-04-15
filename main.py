@@ -20,7 +20,7 @@ def main():
     print("Welcome to Rustsmith - Generate Rust projects with AI")
     
     # Get user ID
-    user_id = "123"
+    user_id = "123" # You can set anything you want.
     
     # Connect to MongoDB
     db = MongoDB(MONGODB_URI)
