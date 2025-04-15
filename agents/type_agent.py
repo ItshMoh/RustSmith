@@ -36,15 +36,31 @@ class TypeAgent:
             str: Response with type definitions, enums, and traits
         """
         system_message = """
-        You are the Type Agent for Rustsmith, a tool that generates Rust projects.
-        Your task is to create appropriate type definitions, enums, and traits for a Rust project.
-        
-        Follow these guidelines:
-        1. Create well-documented enums, type aliases, and traits
-        2. Include derive attributes where appropriate (Debug, Clone, PartialEq, etc.)
-        3. Implement Display and Error traits for error types
-        4. Use Rust naming conventions and best practices
-        5. Provide clear documentation comments for each type definition
+        You are the **Type Agent** for **Rustsmith**, a tool that generates Rust projects.
+
+Your task is to create **type definitions**, **enums**, and **traits** for a given Rust project based on the provided instructions.
+
+---
+
+## Guidelines
+
+1. Create relevant:
+   - `enum`s
+   - `type` aliases
+   - `trait`s
+2. Use `#[derive(...)]` attributes like `Debug`, `Clone`, `PartialEq`, etc., where applicable.
+3. If defining error types, **implement `Display` and `Error`** traits for them.
+4. Follow **Rust naming conventions** and best practices.
+5. Provide clear **documentation comments** (`///`) for each type, variant, and method.
+
+---
+
+## Output Format
+
+- Output must be a **Rust code block** using triple backticks with the `rust` identifier.
+- All comments must be **inside the code block**.
+- Do **not** include any explanation or text outside the code block.
+
         """
         
         # Format the context for the prompt
@@ -70,10 +86,7 @@ class TypeAgent:
         
         {context_str}
         
-        Generate Rust type definitions, enums, and traits that fulfill these requirements.
-        Include omments, appropriate variants/methods, and any necessary
-        derive attributes or implementations.
-        There should be nothing outside the rust code markdown block. The comments will be inside the markdown block, nothing should be outside the markdown block.
+       
         """
         
         messages = [
@@ -89,7 +102,7 @@ class TypeAgent:
         response = requests.post(endpoint, headers=self._prepare_headers(), data=payload)
         if response.status_code == 200:
             response_json = response.json()
-            print('response_json', response_json)
+            # print('response_json', response_json)
             if "choices" in response_json and len(response_json["choices"]) > 0:
                 response_text = response_json["choices"][0]["message"]["content"]
                 print("Response Text:\n", response_text)

@@ -34,15 +34,29 @@ class StructAgent:
             str: Response with struct definitions and implementations
         """
         system_message = """
-        You are the Struct Agent for Rustsmith, a tool that generates Rust projects.
-        Your task is to create appropriate struct definitions for a Rust project.
-        
-        Follow these guidelines:
-        1. Create well-documented structs with appropriate fields and types
-        2. Include derive attributes where appropriate (Debug, Clone, etc.)
-        3. Use Rust naming conventions and best practices
-        4. Provide clear documentation comments for each struct and field
-        5. Focus only on struct definitions, not implementations or methods
+       You are the **Struct Agent** for **Rustsmith**, a tool that generates Rust projects.
+
+Your task is to create **appropriate struct definitions** for a Rust project based on the provided instructions.
+
+---
+
+## Guidelines
+
+1. Define structs with appropriate **fields** and **data types**.
+2. Add relevant `#[derive(...)]` attributes such as `Debug`, `Clone`, `Serialize`, etc., where appropriate.
+3. Follow **Rust naming conventions** and best practices.
+4. Include **documentation comments** (`///`) for each struct and its fields.
+5. Focus **only** on struct definitions — do **not** include implementations, methods, or logic.
+
+---
+
+## Output Format
+
+- Output must be **only a Rust code block** using triple backticks and the `rust` language identifier.
+- All comments (struct-level and field-level) must be **inside** the Rust code block.
+- Do **not** include any explanation or text outside the code block.
+
+---
         """
         
         # Format the context for the prompt
@@ -68,10 +82,6 @@ class StructAgent:
         
         {context_str}
         
-        Generate Rust struct definitions that fulfill these requirements.
-        Include comments, appropriate fields with types,
-        and any necessary derive attributes.
-        There should be nothing outside the rust code markdown block. The comments will be inside the markdown block, nothing should be outside the markdown block.
         """
         
         
@@ -88,7 +98,7 @@ class StructAgent:
         response = requests.post(endpoint, headers=self._prepare_headers(), data=payload)
         if response.status_code == 200:
             response_json = response.json()
-            print('response_json', response_json)
+            # print('response_json', response_json)
             if "choices" in response_json and len(response_json["choices"]) > 0:
                 response_text = response_json["choices"][0]["message"]["content"]
                 print("Response Text:\n", response_text)

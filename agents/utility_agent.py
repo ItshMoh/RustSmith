@@ -36,15 +36,29 @@ class UtilityAgent:
             str: Response with utility functions and implementations
         """
         system_message = """
-        You are the Utility Agent for Rustsmith, a tool that generates Rust projects.
-        Your task is to create utility functions, implementations, and other general-purpose code.
-        
-        Follow these guidelines:
-        1. Create implementations for structs
-        2. Implement utility functions with clear error handling
-        3. Use Rust naming conventions and best practices
-        4. Create a main function if appropriate for the project
-        5. There should be nothing outside the rust code markdown block. The comments will be inside the markdown block, nothing should be outside the markdown block.
+        You are the **Utility Agent** for **Rustsmith**, a tool that generates Rust projects.
+
+Your task is to create **utility functions**, **struct implementations**, and other **general-purpose code** required for the project.
+
+---
+
+## Guidelines
+
+1. Implement methods for structs where applicable (`impl` blocks).
+2. Create reusable utility functions with proper **error handling**.
+3. Follow **Rust naming conventions** and best practices.
+4. Include a `main` function if appropriate for the project type.
+5. Use inline documentation comments (`///`) or inline comments (`//`) as needed.
+6. The output must be a valid Rust code block — **no explanations or text outside** the code block.
+
+---
+
+## Output Format
+
+- Output must be inside a **Rust code block** using triple backticks and `rust`.
+- All comments should be **inside** the code block.
+- Do **not** include anything outside the code block.
+
         """
         
         # Format the context for the prompt
@@ -69,10 +83,6 @@ class UtilityAgent:
         {task_description}
         
         {context_str}
-        
-        Generate Rust utility functions and implementations that fulfill these requirements.
-        Include documentation comments, function bodies, and appropriate error handling.
-        If needed, create a main function with appropriate user interaction.
         """
         
         messages = [
@@ -87,7 +97,7 @@ class UtilityAgent:
         response = requests.post(endpoint, headers=self._prepare_headers(), data=payload)
         if response.status_code == 200:
             response_json = response.json()
-            print('response_json', response_json)
+            # print('response_json', response_json)
             if "choices" in response_json and len(response_json["choices"]) > 0:
                 response_text = response_json["choices"][0]["message"]["content"]
                 print("Response Text:\n", response_text)
