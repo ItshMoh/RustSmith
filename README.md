@@ -9,7 +9,8 @@
 
 Rustsmith takes a project idea from the user and divides the development work among AI agents, each focused on a specific task: It uses small language models which are less than 10b parameters. Our multi agent architecture enhances the Rust coding ability of these small agents which were earlier possible by Large language models.
 
-
+If you are here From the lilypad Hackathon, you can watch the Demo Video here.
+(https://www.loom.com/share/3ab3271cc054487dbfab066de96a603e?sid=bcc1fd98-8d34-4ae6-913a-9ba2d4675773)
 ### Master Agent
 - Analyzes the project idea
 - Breaks it down into manageable subtasks for `Struct Agent`, `Type Agent`, and `Utility Agent`
